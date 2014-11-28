@@ -1,49 +1,41 @@
 package com.jonasboner
 
-trait OnOffDeviceComponent {
-  val onOff: OnOffDevice
-  trait OnOffDevice {
-    def on: Unit
-    def off: Unit
-  }
+trait OnOffDevice {
+  def on: Unit
+  def off: Unit
 }
-trait SensorDeviceComponent {
-  val sensor: SensorDevice
-  trait SensorDevice {
-    def isCoffeePresent: Boolean
+trait SensorDevice {
+  def isCoffeePresent: Boolean
+}
+
+class Heater extends OnOffDevice {
+  def on = println("heater.on")
+  def off = println("heater.off")
+}
+class PotSensor extends SensorDevice {
+  def isCoffeePresent = true
+}
+
+class Warmer(env: {
+  val potSensor: SensorDevice
+  val heater: OnOffDevice
+}) {
+  def trigger = {
+    if (env.potSensor.isCoffeePresent) env.heater.on
+    else env.heater.off
   }
 }
 
-trait OnOffDeviceComponentImpl extends OnOffDeviceComponent {
-  class Heater extends OnOffDevice {
-    def on = println("heater.on")
-    def off = println("heater.off")
-  }
-}
-trait SensorDeviceComponentImpl extends SensorDeviceComponent {
-  class PotSensor extends SensorDevice {
-    def isCoffeePresent = true
-  }
+class Client(env: { val warmer: Warmer }) {
+  env.warmer.trigger
 }
 
-trait WarmerComponentImpl {
-  this: SensorDeviceComponent with OnOffDeviceComponent =>
-  class Warmer {
-    def trigger = {
-      if (sensor.isCoffeePresent) onOff.on
-      else onOff.off
-    }
-  }
-}
-
-object CoffeeComponentRegistry extends OnOffDeviceComponentImpl with SensorDeviceComponentImpl with WarmerComponentImpl {
-
-  val onOff = new Heater
-  val sensor = new PotSensor
-  val warmer = new Warmer
+object Config {
+  lazy val potSensor = new PotSensor
+  lazy val heater = new Heater
+  lazy val warmer = new Warmer(this)
 }
 
 object CoffeePot extends App {
-  val warmer = CoffeeComponentRegistry.warmer
-  warmer.trigger
+  new Client(Config)
 }
