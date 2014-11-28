@@ -9,3 +9,8 @@ Sample code
 -----------
 
 * [User.scala](src/main/scala/com/jonasboner/User.scala)
+
+Unit test
+---------
+
+* [UserSpec.scala](src/test/scala/com/jonasboner/UserSpec.scala)
