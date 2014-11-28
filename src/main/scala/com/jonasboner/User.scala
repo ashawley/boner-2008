@@ -18,7 +18,7 @@ trait UserServiceComponent { this: UserRepositoryComponent =>
   val userService = new UserService
   class UserService {
     def authenticate(username: String, password: String): User =
-      userRepository.authenticate(username, password)
+      userRepository.authenticate(new User(username, password))
     def create(username: String, password: String) =
       userRepository.create(new User(username, password))
     def delete(user: User) = userRepository.delete(user)
