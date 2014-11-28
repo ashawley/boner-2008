@@ -3,7 +3,7 @@ package com.jonasboner
 class User(val username: String, val password: String)
 
 trait UserRepositoryComponent {
-  val userRepository = new UserRepository
+  val userRepository: UserRepository
   class UserRepository {
     def authenticate(user: User): User = {
       println("authenticating user: " + user)
@@ -15,7 +15,7 @@ trait UserRepositoryComponent {
 }
 
 trait UserServiceComponent { this: UserRepositoryComponent =>
-  val userService = new UserService
+  val userService: UserService
   class UserService {
     def authenticate(username: String, password: String): User =
       userRepository.authenticate(new User(username, password))
@@ -25,7 +25,10 @@ trait UserServiceComponent { this: UserRepositoryComponent =>
   }
 }
 
-object ComponentRegistry extends UserServiceComponent with UserRepositoryComponent
+object ComponentRegistry extends UserServiceComponent with UserRepositoryComponent {
+  val userRepository = new UserRepository
+  val userService = new UserService
+}
 
 object User extends App {
   val userService = ComponentRegistry.userService
